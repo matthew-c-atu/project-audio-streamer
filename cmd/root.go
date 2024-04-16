@@ -61,6 +61,9 @@ func (r *RootCfg) serve() {
 	// TODO: Add error handling/logging
 	filepath, _ := r.Flags().GetString("filepath")
 
+	bytes, _ := connect.ReadWav(filepath)
+	println(bytes)
+
 	f, err := os.Open(filepath)
 	if err != nil {
 		log.Fatal(err)
