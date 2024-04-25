@@ -135,6 +135,75 @@ func ReadWav(fp string) ([]byte, error) {
 	// return audioData, nil
 }
 
-func skipHeader(wavBytes []byte) ([]byte, error) {
-	return nil, nil
+func SkipHeader(file *os.File) ([]byte, error) {
+	var nRead int
+	var foundBytes []byte
+	reset := true
+	found := false
+
+	reader := bufio.NewReader(file)
+	for {
+		b, err := reader.ReadByte()
+		nRead++
+		if err != nil {
+			break
+		}
+
+		switch len(foundBytes) {
+		case 0:
+			if b == 'd' {
+				reset = false
+			}
+		case 1:
+			if b == 'a' {
+				reset = false
+			}
+		case 2:
+			if b == 't' {
+				reset = false
+			}
+		case 3:
+			if b == 'a' {
+				reset = false
+				// Found 'data portion of header'
+				found = true
+				n, err := reader.Discard(4)
+				if err != nil {
+					slog.Info("Failed to discard remainder of header:", "nRead", nRead)
+					return nil, err
+				}
+				nRead += n
+				break
+			}
+		default:
+			continue
+		}
+
+		if !reset {
+			foundBytes = append(foundBytes, b)
+		}
+
+		reset = true
+		if found {
+			break
+		}
+	}
+	stat, err := file.Stat()
+	if err != nil {
+		slog.Info("Could not get file stats")
+	}
+	totalFileSize := stat.Size()
+	remaining := int(totalFileSize) - nRead
+	slog.Info("Size of WAV file", "totalFileSize", totalFileSize)
+	slog.Info("Size of remaining data portion of WAV:", "remaining", remaining)
+
+	// make a buffer to store the remaining files
+	remainingBytes := make([]byte, remaining)
+
+	if n, err := reader.Read(remainingBytes); err != nil {
+		slog.Info("Failed to read remaining bytes:", "number read", n)
+		return nil, err
+	}
+
+	return remainingBytes, nil
 }
