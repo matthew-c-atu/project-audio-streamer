@@ -4,6 +4,7 @@ Copyright © 2024 NME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io"
 	"log"
@@ -78,15 +79,19 @@ func (r *RootCfg) serve() {
 		log.Fatal(err)
 	}
 
+	// var base64encoded []byte
+	// enc := base64.Encoding{}
+	str64 := base64.StdEncoding.EncodeToString(contents)
+
 	// totalStreamedSize = 0
 	connPool := connect.NewConnectionPool()
 
 	log.Println("calling go stream...")
-	go connect.Stream(connPool, contents, audioSettings)
+	go connect.Stream(connPool, []byte(str64), audioSettings)
 	// Array equal to sample rate * 1s
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "audio/aac")
+		w.Header().Set("Content-Type", "audio/aac;base64")
 		w.Header().Set("Connection", "keep-alive")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		// w.Header().Set("Transfer-Encoding", "chunked")
