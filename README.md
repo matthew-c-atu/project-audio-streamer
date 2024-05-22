@@ -7,7 +7,7 @@ This can be pulled easily with Docker compose, see: https://github.com/matthew-c
 
 Note that the Docker compose environment does not work. 
 
-Read usage below for instructions on how to run app.
+Read usage below for instructions on how to run the app.
 
 # USAGE
 The below steps describe how to run the entire suite of services in order to run the web app locally.
