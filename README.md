@@ -4,6 +4,7 @@ The Go audio streaming service for the final project music player web app.
 
 The CI pipeline pushes a Docker image to: https://hub.docker.com/repository/docker/matthewatu/project-audio-streamer/general
 This can be pulled easily with Docker compose, see: https://github.com/matthew-c-atu/project-app-local
+
 Note that the Docker compose environment does not work. 
 
 Read usage below for instructions on how to run app.
